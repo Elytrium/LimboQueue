@@ -80,9 +80,11 @@ public class LimboQueue {
                         }
                     }
                 } catch (InterruptedException | ExecutionException ignored) {
+                    LOGGER.info("1");
                     this.QueuedPlayers.forEach((p) -> p.getProxyPlayer().sendMessage(SERIALIZER.deserialize(Config.IMP.MESSAGES.OFFLINESERVER), MessageType.SYSTEM));
                 }
             } else {
+                LOGGER.info("2");
                 this.QueuedPlayers.forEach((p) -> p.getProxyPlayer().sendMessage(SERIALIZER.deserialize(Config.IMP.MESSAGES.OFFLINESERVER), MessageType.SYSTEM));
             }
 
