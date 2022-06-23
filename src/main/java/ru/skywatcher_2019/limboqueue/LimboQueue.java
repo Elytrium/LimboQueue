@@ -72,19 +72,19 @@ public class LimboQueue {
                     serverPing = server1.get().ping().get();
                     if (serverPing.getPlayers().isPresent()) {
                         ServerPing.Players players = serverPing.getPlayers().get();
-                        if (players.getOnline() < players.getMax()) {
-                            this.QueuedPlayers.getFirst().disconnect();
+                        if (players.getOnline() < players.getMax() && this.QueuedPlayers.size() > 0) {
+                            LimboPlayer limboPlayer = this.QueuedPlayers.getFirst();
+                            limboPlayer.disconnect();
+                            this.QueuedPlayers.poll();
                         } else {
-                            AtomicInteger i = new AtomicInteger(1);
+                            AtomicInteger i = new AtomicInteger(0);
                             this.QueuedPlayers.forEach((p) -> p.getProxyPlayer().sendMessage(SERIALIZER.deserialize(MessageFormat.format(queueMessage, i.incrementAndGet())), MessageType.SYSTEM));
                         }
                     }
                 } catch (InterruptedException | ExecutionException ignored) {
-                    LOGGER.info("1");
                     this.QueuedPlayers.forEach((p) -> p.getProxyPlayer().sendMessage(SERIALIZER.deserialize(Config.IMP.MESSAGES.OFFLINESERVER), MessageType.SYSTEM));
                 }
             } else {
-                LOGGER.info("2");
                 this.QueuedPlayers.forEach((p) -> p.getProxyPlayer().sendMessage(SERIALIZER.deserialize(Config.IMP.MESSAGES.OFFLINESERVER), MessageType.SYSTEM));
             }
 
