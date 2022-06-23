@@ -100,8 +100,8 @@ public class LimboQueue {
             setSerializer(new Serializer(serializer));
         }
 
-        VirtualWorld authWorld = this.factory.createVirtualWorld(Dimension.OVERWORLD, 0, 100, 0, (float) 90, (float) 0.0);
-        this.queueServer = this.factory.createLimbo(authWorld).setName("LimboQueue").setWorldTime(6000);
+        VirtualWorld queueWorld = this.factory.createVirtualWorld(Dimension.OVERWORLD, 0, 100, 0, (float) 90, (float) 0.0);
+        this.queueServer = this.factory.createLimbo(queueWorld).setName("LimboQueue").setWorldTime(6000);
         this.server.getEventManager().register(this, new QueueListener(this));
     }
 
