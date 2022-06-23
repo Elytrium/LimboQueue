@@ -6,5 +6,5 @@ LimboQueue is a queue plugin for [Velocity](https://velocitypowered.com) built w
 ## Requirements
 <ul>
 	<li>Latest Velocity</li>
-	<li>latest LimboAPI</li>
+	<li>Latest LimboAPI</li>
 </ul>
