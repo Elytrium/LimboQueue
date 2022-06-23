@@ -8,6 +8,7 @@ import ru.skywatcher_2019.limboqueue.LimboQueue;
 
 public class QueueHandler implements LimboSessionHandler {
     private final LimboQueue plugin;
+    private LimboPlayer player;
 
     public QueueHandler(LimboQueue plugin) {
         this.plugin = plugin;
@@ -15,7 +16,13 @@ public class QueueHandler implements LimboSessionHandler {
 
     @Override
     public void onSpawn(Limbo server, LimboPlayer player) {
-        player.disableFalling();
+        this.player = player;
+        this.player.disableFalling();
         this.plugin.QueuedPlayers.add(player);
+    }
+
+    @Override
+    public void onDisconnect() {
+        this.plugin.QueuedPlayers.remove(this.player);
     }
 }

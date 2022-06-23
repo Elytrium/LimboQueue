@@ -73,8 +73,8 @@ public class LimboQueue {
                     if (serverPing.getPlayers().isPresent()) {
                         ServerPing.Players players = serverPing.getPlayers().get();
                         if (players.getOnline() < players.getMax() && this.QueuedPlayers.size() > 0) {
-                            this.QueuedPlayers.getFirst().disconnect();
-                            this.QueuedPlayers.poll();
+                            LimboPlayer limboPlayer = this.QueuedPlayers.getFirst();
+                            limboPlayer.disconnect();
                         } else {
                             AtomicInteger i = new AtomicInteger(0);
                             this.QueuedPlayers.forEach((p) -> p.getProxyPlayer().sendMessage(SERIALIZER.deserialize(MessageFormat.format(queueMessage, i.incrementAndGet())), MessageType.SYSTEM));
