@@ -63,7 +63,7 @@ public class LimboQueue {
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         this.reload();
-        queueMessage = Config.IMP.MESSAGES.QUEUEMESSAGE;
+        queueMessage = Config.IMP.MESSAGES.QUEUE_MESSAGE;
         Optional<RegisteredServer> server1 = this.getServer().getServer(Config.IMP.MAIN.SERVER);
         this.getServer().getScheduler().buildTask(this, () -> {
             ServerPing serverPing;
@@ -81,10 +81,10 @@ public class LimboQueue {
                         }
                     }
                 } catch (InterruptedException | ExecutionException ignored) {
-                    this.QueuedPlayers.forEach((p) -> p.getProxyPlayer().sendMessage(SERIALIZER.deserialize(Config.IMP.MESSAGES.OFFLINESERVER), MessageType.SYSTEM));
+                    this.QueuedPlayers.forEach((p) -> p.getProxyPlayer().sendMessage(SERIALIZER.deserialize(Config.IMP.MESSAGES.SERVER_OFFLINE), MessageType.SYSTEM));
                 }
             } else {
-                this.QueuedPlayers.forEach((p) -> p.getProxyPlayer().sendMessage(SERIALIZER.deserialize(Config.IMP.MESSAGES.OFFLINESERVER), MessageType.SYSTEM));
+                this.QueuedPlayers.forEach((p) -> p.getProxyPlayer().sendMessage(SERIALIZER.deserialize(Config.IMP.MESSAGES.SERVER_OFFLINE), MessageType.SYSTEM));
             }
 
         }).repeat(2, TimeUnit.SECONDS).schedule();
@@ -100,7 +100,7 @@ public class LimboQueue {
             setSerializer(new Serializer(serializer));
         }
 
-        VirtualWorld queueWorld = this.factory.createVirtualWorld(Dimension.OVERWORLD, 0, 100, 0, (float) 90, (float) 0.0);
+        VirtualWorld queueWorld = this.factory.createVirtualWorld(Dimension.valueOf(Config.IMP.MAIN.WORLD.DIMENSION), 0, 100, 0, (float) 90, (float) 0.0);
         this.queueServer = this.factory.createLimbo(queueWorld).setName("LimboQueue").setWorldTime(6000);
         this.server.getEventManager().register(this, new QueueListener(this));
     }

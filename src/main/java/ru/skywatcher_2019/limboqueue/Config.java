@@ -10,15 +10,29 @@ public class Config extends YamlConfig {
     public MAIN MAIN;
 
     public static class MAIN {
+        @Comment(
+                "Serializers: LEGACY_AMPERSAND, LEGACY_SECTION, MINIMESSAGE"
+        )
         public String SERIALIZER = "MINIMESSAGE";
         public String SERVER = "survival";
+
+        @Create
+        public Config.MAIN.WORLD WORLD;
+
+        public static class WORLD {
+            @Comment(
+                    "Dimensions: OVERWORLD, NETHER, THE_END"
+            )
+            public String DIMENSION = "OVERWORLD";
+        }
+
     }
 
     @Create
     public MESSAGES MESSAGES;
 
     public static class MESSAGES {
-        public String QUEUEMESSAGE = "Игроков в очереди: {0}";
-        public String OFFLINESERVER = "На данный момент сервер выключен.";
+        public String QUEUE_MESSAGE = "Your position in queue: {0}";
+        public String SERVER_OFFLINE = "<red>Server is offline.";
     }
 }
