@@ -8,6 +8,10 @@ plugins {
 group = 'ru.skywatcher_2019'
 version = '1.0-SNAPSHOT'
 
+compileJava {
+    getOptions().setEncoding("UTF-8")
+}
+
 repositories {
     mavenCentral()
     maven {
@@ -25,8 +29,6 @@ dependencies {
     annotationProcessor 'com.velocitypowered:velocity-api:3.1.2-SNAPSHOT'
     implementation("net.elytrium:elytrium-java-commons:1.0.5")
     compileOnly("net.elytrium:limboapi-api:1.0.5")
-//    implementation files('libs/elytrium-java-commons-1.0.5.jar')
-//    compileOnly files('libs/limboapi-plugin-1.0.6-SNAPSHOT-a84ab0cc.jar')
 }
 shadowJar {
     getArchiveClassifier().set("")
