@@ -15,6 +15,10 @@ public class Config extends YamlConfig {
         )
         public String SERIALIZER = "MINIMESSAGE";
         public String SERVER = "survival";
+        @Comment(
+                "Server checking interval in seconds"
+        )
+        public int CHECK_INTERVAL = 2;
 
         @Create
         public Config.MAIN.WORLD WORLD;

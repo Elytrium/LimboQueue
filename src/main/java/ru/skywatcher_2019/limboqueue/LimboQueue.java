@@ -47,6 +47,8 @@ public class LimboQueue {
     private Limbo queueServer;
     public LinkedList<LimboPlayer> QueuedPlayers = new LinkedList<>();
     private String queueMessage;
+    private Component serverOfflineMessage;
+    private int checkInterval;
 
     @Inject
     public LimboQueue(Logger logger, ProxyServer server, @DataDirectory Path dataDirectory) {
@@ -64,12 +66,14 @@ public class LimboQueue {
     public void onProxyInitialization(ProxyInitializeEvent event) {
         this.reload();
         queueMessage = Config.IMP.MESSAGES.QUEUE_MESSAGE;
-        Optional<RegisteredServer> server1 = this.getServer().getServer(Config.IMP.MAIN.SERVER);
+        serverOfflineMessage = SERIALIZER.deserialize(Config.IMP.MESSAGES.SERVER_OFFLINE);
+        checkInterval = Config.IMP.MAIN.CHECK_INTERVAL;
+        Optional<RegisteredServer> server = this.getServer().getServer(Config.IMP.MAIN.SERVER);
         this.getServer().getScheduler().buildTask(this, () -> {
             ServerPing serverPing;
-            if (server1.isPresent()) {
+            if (server.isPresent()) {
                 try {
-                    serverPing = server1.get().ping().get();
+                    serverPing = server.get().ping().get();
                     if (serverPing.getPlayers().isPresent()) {
                         ServerPing.Players players = serverPing.getPlayers().get();
                         if (players.getOnline() < players.getMax() && this.QueuedPlayers.size() > 0) {
@@ -81,13 +85,13 @@ public class LimboQueue {
                         }
                     }
                 } catch (InterruptedException | ExecutionException ignored) {
-                    this.QueuedPlayers.forEach((p) -> p.getProxyPlayer().sendMessage(SERIALIZER.deserialize(Config.IMP.MESSAGES.SERVER_OFFLINE), MessageType.SYSTEM));
+                    this.QueuedPlayers.forEach((p) -> p.getProxyPlayer().sendMessage(serverOfflineMessage, MessageType.SYSTEM));
                 }
             } else {
-                this.QueuedPlayers.forEach((p) -> p.getProxyPlayer().sendMessage(SERIALIZER.deserialize(Config.IMP.MESSAGES.SERVER_OFFLINE), MessageType.SYSTEM));
+                this.QueuedPlayers.forEach((p) -> p.getProxyPlayer().sendMessage(serverOfflineMessage, MessageType.SYSTEM));
             }
 
-        }).repeat(2, TimeUnit.SECONDS).schedule();
+        }).repeat(checkInterval, TimeUnit.SECONDS).schedule();
     }
 
     private void reload() {
