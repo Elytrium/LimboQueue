@@ -48,12 +48,13 @@ public class LimboQueue {
     private final File configFile;
     private final LimboFactory factory;
     private Limbo queueServer;
-    public LinkedList<LimboPlayer> QueuedPlayers = new LinkedList<>();
+    public LinkedList<LimboPlayer> queuedPlayers = new LinkedList<>();
     private String queueMessage;
     private Component serverOfflineMessage;
     private int checkInterval;
     private RegisteredServer targetServer;
-    private ScheduledTask queueTask;
+    private ScheduledTask queueTask, pingTask;
+    public boolean isFull, isOffline = false;
 
     @Inject
     public LimboQueue(Logger logger, ProxyServer server, @DataDirectory Path dataDirectory) {
@@ -96,7 +97,8 @@ public class LimboQueue {
 
         Optional<RegisteredServer> server = this.getServer().getServer(Config.IMP.MAIN.SERVER);
         server.ifPresent(registeredServer -> this.targetServer = registeredServer);
-        this.startQueue();
+        this.startPingTask();
+        this.startQueueTask();
     }
 
     private static void setSerializer(Serializer serializer) {
@@ -114,28 +116,40 @@ public class LimboQueue {
     public ProxyServer getServer() {
         return this.server;
     }
+
     public static Serializer getSerializer() {
         return SERIALIZER;
     }
 
-    private void startQueue() {
+    private void startQueueTask() {
         if (this.queueTask != null) this.queueTask.cancel();
         this.queueTask = this.getServer().getScheduler().buildTask(this, () -> {
-            ServerPing serverPing;
+            if (this.isOffline) {
+                if (!this.isFull && this.queuedPlayers.size() > 0) {
+                    LimboPlayer limboPlayer = this.queuedPlayers.getFirst();
+                    limboPlayer.disconnect();
+                } else {
+                    AtomicInteger i = new AtomicInteger(0);
+                    this.queuedPlayers.forEach((p) -> p.getProxyPlayer().sendMessage(SERIALIZER.deserialize(MessageFormat.format(queueMessage, i.incrementAndGet())), MessageType.SYSTEM));
+                }
+            } else {
+                this.queuedPlayers.forEach((p) -> p.getProxyPlayer().sendMessage(serverOfflineMessage, MessageType.SYSTEM));
+            }
+        }).repeat(checkInterval, TimeUnit.SECONDS).schedule();
+    }
+
+    private void startPingTask() {
+        if (this.pingTask != null) this.pingTask.cancel();
+        this.pingTask = this.getServer().getScheduler().buildTask(this, () -> {
             try {
-                serverPing = this.targetServer.ping().get();
+                ServerPing serverPing = this.targetServer.ping().get();
                 if (serverPing.getPlayers().isPresent()) {
                     ServerPing.Players players = serverPing.getPlayers().get();
-                    if (players.getOnline() < players.getMax() && this.QueuedPlayers.size() > 0) {
-                        LimboPlayer limboPlayer = this.QueuedPlayers.getFirst();
-                        limboPlayer.disconnect();
-                    } else {
-                        AtomicInteger i = new AtomicInteger(0);
-                        this.QueuedPlayers.forEach((p) -> p.getProxyPlayer().sendMessage(SERIALIZER.deserialize(MessageFormat.format(queueMessage, i.incrementAndGet())), MessageType.SYSTEM));
-                    }
+                    this.isFull = players.getOnline() >= players.getMax();
+                    this.isOffline = false;
                 }
             } catch (InterruptedException | ExecutionException | NullPointerException ignored) {
-                this.QueuedPlayers.forEach((p) -> p.getProxyPlayer().sendMessage(serverOfflineMessage, MessageType.SYSTEM));
+                this.isOffline = true;
             }
         }).repeat(checkInterval, TimeUnit.SECONDS).schedule();
     }

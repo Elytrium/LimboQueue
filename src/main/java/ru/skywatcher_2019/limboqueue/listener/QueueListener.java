@@ -13,6 +13,8 @@ public class QueueListener {
 
     @Subscribe
     public void onLoginLimboRegister(LoginLimboRegisterEvent event) {
-        event.addCallback(() -> this.plugin.queuePlayer(event.getPlayer()));
+        if (plugin.isFull || plugin.isOffline) {
+            event.addCallback(() -> this.plugin.queuePlayer(event.getPlayer()));
+        }
     }
 }
