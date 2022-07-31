@@ -22,16 +22,17 @@ import net.elytrium.limboapi.api.event.LoginLimboRegisterEvent;
 import ru.skywatcher_2019.limboqueue.LimboQueue;
 
 public class QueueListener {
-    private final LimboQueue plugin;
 
-    public QueueListener(LimboQueue plugin) {
-        this.plugin = plugin;
-    }
+  private final LimboQueue plugin;
 
-    @Subscribe
-    public void onLoginLimboRegister(LoginLimboRegisterEvent event) {
-        if (plugin.isFull || plugin.isOffline) {
-            event.addCallback(() -> this.plugin.queuePlayer(event.getPlayer()));
-        }
+  public QueueListener(LimboQueue plugin) {
+    this.plugin = plugin;
+  }
+
+  @Subscribe
+  public void onLoginLimboRegister(LoginLimboRegisterEvent event) {
+    if (plugin.isFull || plugin.isOffline) {
+      event.addCallback(() -> this.plugin.queuePlayer(event.getPlayer()));
     }
+  }
 }
