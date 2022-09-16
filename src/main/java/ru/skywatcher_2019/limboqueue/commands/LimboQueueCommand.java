@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableList;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import net.elytrium.java.commons.mc.serialization.Serializer;
 import net.kyori.adventure.audience.MessageType;
@@ -30,14 +29,7 @@ import ru.skywatcher_2019.limboqueue.Config;
 import ru.skywatcher_2019.limboqueue.LimboQueue;
 
 public class LimboQueueCommand implements SimpleCommand {
-
-  private static final Map<String, Component> SUBCOMMANDS = Map.of(
-      "reload", Component.textOfChildren(
-          Component.text("  /limboqueue reload"),
-          Component.text(" - "),
-          Component.text("Reload config.")
-      )
-  );
+  
   private final LimboQueue plugin;
   private final Component reload;
   private final Component reloadFailed;
@@ -51,19 +43,10 @@ public class LimboQueueCommand implements SimpleCommand {
 
   @Override
   public List<String> suggest(Invocation invocation) {
-    CommandSource source = invocation.source();
     String[] args = invocation.arguments();
 
     if (args.length == 0) {
-      return SUBCOMMANDS.keySet().stream()
-          .filter(command -> source.hasPermission("limboqueue." + command))
-          .collect(Collectors.toList());
-    } else if (args.length == 1) {
-      String argument = args[0];
-      return SUBCOMMANDS.keySet().stream()
-          .filter(command -> source.hasPermission("limbofilter." + command))
-          .filter(command -> command.regionMatches(true, 0, argument, 0, argument.length()))
-          .collect(Collectors.toList());
+      return ImmutableList.of("reload");
     } else {
       return ImmutableList.of();
     }
