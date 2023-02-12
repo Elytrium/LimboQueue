@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 - 2022 SkyWatcher_2019
+ * Copyright (C) 2022 - 2023 Elytrium
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ru.skywatcher_2019.limboqueue;
+package net.elytrium.limboqueue;
 
 import com.google.inject.Inject;
 import com.velocitypowered.api.command.CommandManager;
@@ -39,22 +39,21 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import net.elytrium.java.commons.mc.serialization.Serializer;
-import net.elytrium.java.commons.mc.serialization.Serializers;
+import net.elytrium.commons.kyori.serialization.Serializer;
+import net.elytrium.commons.kyori.serialization.Serializers;
 import net.elytrium.limboapi.api.Limbo;
 import net.elytrium.limboapi.api.LimboFactory;
 import net.elytrium.limboapi.api.chunk.Dimension;
 import net.elytrium.limboapi.api.chunk.VirtualWorld;
 import net.elytrium.limboapi.api.player.LimboPlayer;
-import net.kyori.adventure.audience.MessageType;
+import net.elytrium.limboqueue.commands.LimboQueueCommand;
+import net.elytrium.limboqueue.handler.QueueHandler;
+import net.elytrium.limboqueue.listener.QueueListener;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.ComponentSerializer;
 import org.slf4j.Logger;
-import ru.skywatcher_2019.limboqueue.commands.LimboQueueCommand;
-import ru.skywatcher_2019.limboqueue.handler.QueueHandler;
-import ru.skywatcher_2019.limboqueue.listener.QueueListener;
 
-@Plugin(id = "limboqueue", name = "LimboQueue", version = "1.0-SNAPSHOT", authors = {"skywatcher_2019", "hevav"})
+@Plugin(id = "limboqueue", name = "LimboQueue", version = "1.0.1", authors = {"skywatcher_2019", "hevav"})
 public class LimboQueue {
 
   @Inject
@@ -64,13 +63,15 @@ public class LimboQueue {
   private final File configFile;
   private final LimboFactory factory;
   public LinkedList<LimboPlayer> queuedPlayers = new LinkedList<>();
-  public boolean isFull, isOffline = false;
+  public boolean isFull = false;
+  public boolean isOffline = false;
   private Limbo queueServer;
   private String queueMessage;
   private Component serverOfflineMessage;
   private int checkInterval;
   private RegisteredServer targetServer;
-  private ScheduledTask queueTask, pingTask;
+  private ScheduledTask queueTask;
+  private ScheduledTask pingTask;
 
   @Inject
   public LimboQueue(Logger logger, ProxyServer server, @DataDirectory Path dataDirectory) {
@@ -139,9 +140,9 @@ public class LimboQueue {
   }
 
   private void startQueueTask() {
-      if (this.queueTask != null) {
-          this.queueTask.cancel();
-      }
+    if (this.queueTask != null) {
+      this.queueTask.cancel();
+    }
     this.queueTask = this.getServer().getScheduler().buildTask(this, () -> {
       if (this.isOffline) {
         if (!this.isFull && this.queuedPlayers.size() > 0) {
@@ -150,18 +151,18 @@ public class LimboQueue {
         } else {
           AtomicInteger i = new AtomicInteger(0);
           this.queuedPlayers.forEach(
-              (p) -> p.getProxyPlayer().sendMessage(SERIALIZER.deserialize(MessageFormat.format(queueMessage, i.incrementAndGet())), MessageType.SYSTEM));
+              (p) -> p.getProxyPlayer().sendMessage(SERIALIZER.deserialize(MessageFormat.format(this.queueMessage, i.incrementAndGet()))));
         }
       } else {
-        this.queuedPlayers.forEach((p) -> p.getProxyPlayer().sendMessage(serverOfflineMessage, MessageType.SYSTEM));
+        this.queuedPlayers.forEach((p) -> p.getProxyPlayer().sendMessage(this.serverOfflineMessage));
       }
-    }).repeat(checkInterval, TimeUnit.SECONDS).schedule();
+    }).repeat(this.checkInterval, TimeUnit.SECONDS).schedule();
   }
 
   private void startPingTask() {
-      if (this.pingTask != null) {
-          this.pingTask.cancel();
-      }
+    if (this.pingTask != null) {
+      this.pingTask.cancel();
+    }
     this.pingTask = this.getServer().getScheduler().buildTask(this, () -> {
       try {
         ServerPing serverPing = this.targetServer.ping().get();
@@ -170,9 +171,9 @@ public class LimboQueue {
           this.isFull = players.getOnline() >= players.getMax();
           this.isOffline = false;
         }
-      } catch (InterruptedException | ExecutionException | NullPointerException ignored) {
+      } catch (InterruptedException | ExecutionException ignored) {
         this.isOffline = true;
       }
-    }).repeat(checkInterval, TimeUnit.SECONDS).schedule();
+    }).repeat(this.checkInterval, TimeUnit.SECONDS).schedule();
   }
 }

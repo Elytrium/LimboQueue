@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 - 2022 SkyWatcher_2019
+ * Copyright (C) 2022 - 2023 Elytrium
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,21 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ru.skywatcher_2019.limboqueue.commands;
+package net.elytrium.limboqueue.commands;
 
 import com.google.common.collect.ImmutableList;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import java.util.List;
-import java.util.stream.Collectors;
-import net.elytrium.java.commons.mc.serialization.Serializer;
-import net.kyori.adventure.audience.MessageType;
+import net.elytrium.commons.kyori.serialization.Serializer;
+import net.elytrium.limboqueue.Config;
+import net.elytrium.limboqueue.LimboQueue;
 import net.kyori.adventure.text.Component;
-import ru.skywatcher_2019.limboqueue.Config;
-import ru.skywatcher_2019.limboqueue.LimboQueue;
 
 public class LimboQueueCommand implements SimpleCommand {
-  
+
   private final LimboQueue plugin;
   private final Component reload;
   private final Component reloadFailed;
@@ -62,10 +60,10 @@ public class LimboQueueCommand implements SimpleCommand {
       if (command.equalsIgnoreCase("reload") && source.hasPermission("limboqueue.reload")) {
         try {
           this.plugin.reload();
-          source.sendMessage(this.reload, MessageType.SYSTEM);
+          source.sendMessage(this.reload);
         } catch (Exception e) {
           e.printStackTrace();
-          source.sendMessage(this.reloadFailed, MessageType.SYSTEM);
+          source.sendMessage(this.reloadFailed);
         }
       }
     }

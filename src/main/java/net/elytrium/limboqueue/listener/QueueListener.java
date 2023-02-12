@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 - 2022 SkyWatcher_2019
+ * Copyright (C) 2022 - 2023 Elytrium
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ru.skywatcher_2019.limboqueue.listener;
+package net.elytrium.limboqueue.listener;
 
 import com.velocitypowered.api.event.Subscribe;
 import net.elytrium.limboapi.api.event.LoginLimboRegisterEvent;
-import ru.skywatcher_2019.limboqueue.LimboQueue;
+import net.elytrium.limboqueue.LimboQueue;
 
 public class QueueListener {
 
@@ -31,8 +31,8 @@ public class QueueListener {
 
   @Subscribe
   public void onLoginLimboRegister(LoginLimboRegisterEvent event) {
-    if (plugin.isFull || plugin.isOffline) {
-      event.addCallback(() -> this.plugin.queuePlayer(event.getPlayer()));
+    if (this.plugin.isFull || this.plugin.isOffline) {
+      event.addOnJoinCallback(() -> this.plugin.queuePlayer(event.getPlayer()));
     }
   }
 }

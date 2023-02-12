@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 - 2022 SkyWatcher_2019
+ * Copyright (C) 2022 - 2023 Elytrium
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ru.skywatcher_2019.limboqueue;
+package net.elytrium.limboqueue;
 
-import net.elytrium.java.commons.config.YamlConfig;
+import net.elytrium.commons.config.YamlConfig;
 
 public class Config extends YamlConfig {
 
@@ -31,14 +31,11 @@ public class Config extends YamlConfig {
 
   public static class MAIN {
 
-    @Comment(
-        "Serializers: LEGACY_AMPERSAND, LEGACY_SECTION, MINIMESSAGE"
-    )
+    @Comment("Serializers: LEGACY_AMPERSAND, LEGACY_SECTION, MINIMESSAGE")
     public String SERIALIZER = "MINIMESSAGE";
+    @Comment("Server from velocity.toml which will checked for online")
     public String SERVER = "survival";
-    @Comment(
-        "Server checking interval in seconds"
-    )
+    @Comment("Server checking interval in seconds")
     public int CHECK_INTERVAL = 2;
 
     @Create
@@ -46,9 +43,7 @@ public class Config extends YamlConfig {
 
     public static class WORLD {
 
-      @Comment(
-          "Dimensions: OVERWORLD, NETHER, THE_END"
-      )
+      @Comment("Dimensions: OVERWORLD, NETHER, THE_END")
       public String DIMENSION = "OVERWORLD";
     }
 

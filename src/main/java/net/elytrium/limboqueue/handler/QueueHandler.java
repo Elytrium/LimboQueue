@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 - 2022 SkyWatcher_2019
+ * Copyright (C) 2022 - 2023 Elytrium
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ru.skywatcher_2019.limboqueue.handler;
+package net.elytrium.limboqueue.handler;
 
 
 import net.elytrium.limboapi.api.Limbo;
 import net.elytrium.limboapi.api.LimboSessionHandler;
 import net.elytrium.limboapi.api.player.LimboPlayer;
-import ru.skywatcher_2019.limboqueue.LimboQueue;
+import net.elytrium.limboqueue.LimboQueue;
 
 public class QueueHandler implements LimboSessionHandler {
 

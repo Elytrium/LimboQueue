@@ -25,7 +25,7 @@
 #   (1) You need a POSIX-compliant shell to run this script. If your /bin/sh is
 #       noncompliant, but you have some other compliant shell such as ksh or
 #       bash, then to run this script, type that shell name before the whole
-#       commands line, like:
+#       command line, like:
 #
 #           ksh Gradle
 #
@@ -35,7 +35,7 @@
 #         * expansions «$var», «${var}», «${var:-default}», «${var+SET}»,
 #           «${var#prefix}», «${var%suffix}», and «$( cmd )»;
 #         * compound commands having a testable exit status, especially «case»;
-#         * various built-in commands including «commands», «set», and «ulimit».
+#         * various built-in commands including «command», «set», and «ulimit».
 #
 #   Important for patching:
 #
@@ -55,7 +55,7 @@
 #       Darwin, MinGW, and NonStop.
 #
 #   (3) This script is generated from the Groovy template
-#       https://github.com/gradle/gradle/blob/master/subprojects/plugins/src/main/resources/org/gradle/api/internal/plugins/unixStartScript.txt
+#       https://github.com/gradle/gradle/blob/HEAD/subprojects/plugins/src/main/resources/org/gradle/api/internal/plugins/unixStartScript.txt
 #       within the Gradle project.
 #
 #       You can find Gradle at https://github.com/gradle/gradle/.
@@ -80,10 +80,10 @@ do
     esac
 done
 
-APP_HOME=$( cd "${APP_HOME:-./}" && pwd -P ) || exit
-
-APP_NAME="Gradle"
+# This is normally unused
+# shellcheck disable=SC2034
 APP_BASE_NAME=${0##*/}
+APP_HOME=$( cd "${APP_HOME:-./}" && pwd -P ) || exit
 
 # Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
 DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
@@ -117,7 +117,7 @@ esac
 CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
 
 
-# Determine the Java commands to use to start the JVM.
+# Determine the Java command to use to start the JVM.
 if [ -n "$JAVA_HOME" ] ; then
     if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
         # IBM's JDK on AIX uses strange locations for the executables
@@ -143,19 +143,23 @@ fi
 if ! "$cygwin" && ! "$darwin" && ! "$nonstop" ; then
     case $MAX_FD in #(
       max*)
+        # In POSIX sh, ulimit -H is undefined. That's why the result is checked to see if it worked.
+        # shellcheck disable=SC3045 
         MAX_FD=$( ulimit -H -n ) ||
             warn "Could not query maximum file descriptor limit"
     esac
     case $MAX_FD in  #(
       '' | soft) :;; #(
       *)
+        # In POSIX sh, ulimit -n is undefined. That's why the result is checked to see if it worked.
+        # shellcheck disable=SC3045 
         ulimit -n "$MAX_FD" ||
             warn "Could not set maximum file descriptor limit to $MAX_FD"
     esac
 fi
 
-# Collect all arguments for the java commands, stacking in reverse order:
-#   * args from the commands line
+# Collect all arguments for the java command, stacking in reverse order:
+#   * args from the command line
 #   * the main class name
 #   * -classpath
 #   * -D...appname settings
@@ -193,7 +197,7 @@ if "$cygwin" || "$msys" ; then
     done
 fi
 
-# Collect all arguments for the java commands;
+# Collect all arguments for the java command;
 #   * $DEFAULT_JVM_OPTS, $JAVA_OPTS, and $GRADLE_OPTS can contain fragments of
 #     shell script including quotes and variable substitutions, so put them in
 #     double quotes to make sure that they get re-expanded; and
@@ -205,6 +209,12 @@ set -- \
         org.gradle.wrapper.GradleWrapperMain \
         "$@"
 
+# Stop when "xargs" is not available.
+if ! command -v xargs >/dev/null 2>&1
+then
+    die "xargs is not available"
+fi
+
 # Use "xargs" to parse quoted args.
 #
 # With -n1 it outputs one arg per line, with the quotes and backslashes removed.
@@ -214,7 +224,7 @@ set -- \
 #   readarray ARGS < <( xargs -n1 <<<"$var" ) &&
 #   set -- "${ARGS[@]}" "$@"
 #
-# but POSIX shell has neither arrays nor commands substitution, so instead we
+# but POSIX shell has neither arrays nor command substitution, so instead we
 # post-process each arg (as a line of input to sed) to backslash-escape any
 # character that might be a shell metacharacter, then use eval to reverse
 # that process (while maintaining the separation between arguments), and wrap
