@@ -144,7 +144,7 @@ public class LimboQueue {
       this.queueTask.cancel();
     }
     this.queueTask = this.getServer().getScheduler().buildTask(this, () -> {
-      if (this.isOffline) {
+      if (!this.isOffline) {
         if (!this.isFull && this.queuedPlayers.size() > 0) {
           LimboPlayer limboPlayer = this.queuedPlayers.getFirst();
           limboPlayer.disconnect();
