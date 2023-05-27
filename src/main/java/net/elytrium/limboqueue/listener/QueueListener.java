@@ -31,7 +31,7 @@ public class QueueListener {
 
   @Subscribe
   public void onLoginLimboRegister(LoginLimboRegisterEvent event) {
-    if (!event.getPlayer().hasPermission("limboqueue.bypass") && (this.plugin.isFull || this.plugin.isOffline)) {
+    if (!event.getPlayer().hasPermission("limboqueue.bypass") && this.plugin.isFull) {
       event.addOnJoinCallback(() -> this.plugin.queuePlayer(event.getPlayer()));
     }
   }

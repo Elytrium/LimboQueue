@@ -64,10 +64,8 @@ public class LimboQueue {
   private final LimboFactory factory;
   public LinkedList<LimboPlayer> queuedPlayers = new LinkedList<>();
   public boolean isFull = false;
-  public boolean isOffline = false;
   private Limbo queueServer;
   private String queueMessage;
-  private Component serverOfflineMessage;
   private int checkInterval;
   private RegisteredServer targetServer;
   private ScheduledTask queueTask;
@@ -114,7 +112,6 @@ public class LimboQueue {
     }
 
     this.queueMessage = Config.IMP.MESSAGES.QUEUE_MESSAGE;
-    this.serverOfflineMessage = SERIALIZER.deserialize(Config.IMP.MESSAGES.SERVER_OFFLINE);
     this.checkInterval = Config.IMP.MAIN.CHECK_INTERVAL;
 
     VirtualWorld queueWorld = this.factory.createVirtualWorld(Dimension.valueOf(Config.IMP.MAIN.WORLD.DIMENSION), 0, 100, 0, (float) 90, (float) 0.0);
@@ -144,17 +141,13 @@ public class LimboQueue {
       this.queueTask.cancel();
     }
     this.queueTask = this.getServer().getScheduler().buildTask(this, () -> {
-      if (!this.isOffline) {
-        if (!this.isFull && this.queuedPlayers.size() > 0) {
-          LimboPlayer limboPlayer = this.queuedPlayers.getFirst();
-          limboPlayer.disconnect();
-        } else {
-          AtomicInteger i = new AtomicInteger(0);
-          this.queuedPlayers.forEach(
-              (p) -> p.getProxyPlayer().sendMessage(SERIALIZER.deserialize(MessageFormat.format(this.queueMessage, i.incrementAndGet()))));
-        }
+      if (!this.isFull && this.queuedPlayers.size() > 0) {
+        LimboPlayer limboPlayer = this.queuedPlayers.getFirst();
+        limboPlayer.disconnect();
       } else {
-        this.queuedPlayers.forEach((p) -> p.getProxyPlayer().sendMessage(this.serverOfflineMessage));
+        AtomicInteger i = new AtomicInteger(0);
+        this.queuedPlayers.forEach(
+            (p) -> p.getProxyPlayer().sendMessage(SERIALIZER.deserialize(MessageFormat.format(this.queueMessage, i.incrementAndGet()))));
       }
     }).repeat(this.checkInterval, TimeUnit.SECONDS).schedule();
   }
@@ -169,10 +162,9 @@ public class LimboQueue {
         if (serverPing.getPlayers().isPresent()) {
           ServerPing.Players players = serverPing.getPlayers().get();
           this.isFull = players.getOnline() >= players.getMax();
-          this.isOffline = false;
         }
       } catch (InterruptedException | ExecutionException ignored) {
-        this.isOffline = true;
+        this.isFull = false;
       }
     }).repeat(this.checkInterval, TimeUnit.SECONDS).schedule();
   }
