@@ -35,6 +35,8 @@ public class Config extends YamlConfig {
     public String SERIALIZER = "MINIMESSAGE";
     @Comment("Server from velocity.toml which will checked for online")
     public String SERVER = "survival";
+    @Comment("Send player to the queue if kick reason contains this text (like \"The server if full!\")")
+    public String KICK_MESSAGE = "The server is full";
     @Comment("Server checking interval in seconds")
     public int CHECK_INTERVAL = 2;
 

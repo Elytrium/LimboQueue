@@ -18,12 +18,15 @@
 package net.elytrium.limboqueue.listener;
 
 import com.velocitypowered.api.event.Subscribe;
+import net.elytrium.commons.kyori.serialization.Serializer;
 import net.elytrium.limboapi.api.event.LoginLimboRegisterEvent;
+import net.elytrium.limboqueue.Config;
 import net.elytrium.limboqueue.LimboQueue;
 
 public class QueueListener {
 
   private final LimboQueue plugin;
+  private final Serializer serializer = LimboQueue.getSerializer();
 
   public QueueListener(LimboQueue plugin) {
     this.plugin = plugin;
@@ -31,8 +34,21 @@ public class QueueListener {
 
   @Subscribe
   public void onLoginLimboRegister(LoginLimboRegisterEvent event) {
-    if (!event.getPlayer().hasPermission("limboqueue.bypass") && this.plugin.isFull) {
-      event.addOnJoinCallback(() -> this.plugin.queuePlayer(event.getPlayer()));
-    }
+    event.setOnKickCallback((kickEvent) -> {
+      if (!kickEvent.getServer().equals(this.plugin.targetServer)) {
+        return false;
+      }
+
+      if (kickEvent.getServerKickReason().isEmpty()) {
+        return false;
+      }
+
+      String reason = this.serializer.serialize(kickEvent.getServerKickReason().get());
+      if (reason.contains(Config.IMP.MAIN.KICK_MESSAGE)) {
+        this.plugin.queuePlayer(kickEvent.getPlayer());
+        return true;
+      }
+      return false;
+    });
   }
 }

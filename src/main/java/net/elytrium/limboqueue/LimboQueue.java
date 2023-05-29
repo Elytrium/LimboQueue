@@ -64,10 +64,10 @@ public class LimboQueue {
   private final LimboFactory factory;
   public LinkedList<LimboPlayer> queuedPlayers = new LinkedList<>();
   public boolean isFull = false;
+  public RegisteredServer targetServer;
   private Limbo queueServer;
   private String queueMessage;
   private int checkInterval;
-  private RegisteredServer targetServer;
   private ScheduledTask queueTask;
   private ScheduledTask pingTask;
 
@@ -164,7 +164,7 @@ public class LimboQueue {
           this.isFull = players.getOnline() >= players.getMax();
         }
       } catch (InterruptedException | ExecutionException ignored) {
-        this.isFull = false;
+        this.isFull = true;
       }
     }).repeat(this.checkInterval, TimeUnit.SECONDS).schedule();
   }
