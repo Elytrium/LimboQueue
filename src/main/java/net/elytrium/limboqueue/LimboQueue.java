@@ -123,9 +123,11 @@ public class LimboQueue {
     manager.register("limboqueue", new LimboQueueCommand(this), "lq", "queue");
 
     Optional<RegisteredServer> server = this.getServer().getServer(Config.IMP.MAIN.SERVER);
-    server.ifPresent(registeredServer -> this.targetServer = registeredServer);
-    this.startPingTask();
-    this.startQueueTask();
+    server.ifPresentOrElse(registeredServer -> {
+      this.targetServer = registeredServer;
+      this.startPingTask();
+      this.startQueueTask();
+    }, () -> LOGGER.error("Server " + Config.IMP.MAIN.SERVER + " doesn't exists!"));
   }
 
   public void queuePlayer(Player player) {
